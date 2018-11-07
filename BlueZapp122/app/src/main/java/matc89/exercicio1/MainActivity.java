@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
     ArrayAdapter<String> arrayAdapter;
     TextView textView;
+    TextView textView2;
     ProgressBar progbar;
 
     @Override
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.listView);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         textView = (TextView)findViewById(R.id.textView);
+        textView2 = (TextView)findViewById(R.id.textView2);
         progbar = (ProgressBar) findViewById(R.id.progressBar);
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -54,10 +56,16 @@ public class MainActivity extends AppCompatActivity {
 
                 switch1.setChecked(true);
                 switch1.setText("Ativado");
-                textView.setText("Dispositivos Disponíveis");
+                textView.setText("Dispositivos Disponíveis ----------------------------");
                 progbar.setVisibility(View.VISIBLE);
+                textView2.setText("");
 
                 listarDispositivos(this);
+            }
+            else
+            {
+                textView.setText("");
+                textView2.setText("Com o Bluetooth ativado, o dispositivo pode se comunicar.");
             }
         }
 
@@ -71,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     switch1.setText("Ativado");
-                    textView.setText("Dispositivos Disponíveis");
+                    textView.setText("Dispositivos Disponíveis ----------------------------");
+                    textView2.setText("");
                     progbar.setVisibility(View.VISIBLE);
 
                     while (bluetoothAdapter.isDiscovering() == false) {
@@ -82,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         switch1.setText("Desativado");
                         textView.setText("");
+                        textView2.setText("Com o Bluetooth ativado, o dispositivo pode se comunicar.");
                         progbar.setVisibility(View.INVISIBLE);
                         arrayAdapter.clear();
                         if (bluetoothAdapter.isEnabled())

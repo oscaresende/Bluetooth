@@ -20,15 +20,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
     Switch switch1;
     ListView listView;
+    ListView listView2;
     BluetoothAdapter bluetoothAdapter;
     ArrayAdapter<String> arrayAdapter;
+    ArrayAdapter<String> arrayAdapter2;
     TextView textView;
     TextView textView2;
-    ProgressBar progbar;
+    TextView textView3;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +42,12 @@ public class MainActivity extends AppCompatActivity {
 
         switch1 = (Switch) findViewById(R.id.switch1);
         listView = (ListView)findViewById(R.id.listView);
+        listView2 = (ListView)findViewById(R.id.listView2);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         textView = (TextView)findViewById(R.id.textView);
         textView2 = (TextView)findViewById(R.id.textView2);
-        progbar = (ProgressBar) findViewById(R.id.progressBar);
+        textView3 = (TextView)findViewById(R.id.textView3);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar2);
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1001);
@@ -56,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
                 switch1.setChecked(true);
                 switch1.setText("Ativado");
-                textView.setText("Dispositivos Disponíveis ----------------------------");
-                progbar.setVisibility(View.VISIBLE);
+                textView.setText("Dispositivos Pareados -----------------------------------------");
+                textView3.setText("Dispositivos Disponíveis ----------------------------");
+                progressBar.setVisibility(View.VISIBLE);
+
                 textView2.setText("");
 
                 listarDispositivos(this);
@@ -65,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             else
             {
                 textView.setText("");
+                textView3.setText("");
                 textView2.setText("Com o Bluetooth ativado, o dispositivo pode se comunicar.");
             }
         }
@@ -79,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     switch1.setText("Ativado");
-                    textView.setText("Dispositivos Disponíveis ----------------------------");
+                    textView.setText("Dispositivos Pareados -----------------------------------------");
+                    textView3.setText("Dispositivos Disponíveis ----------------------------");
                     textView2.setText("");
-                    progbar.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
 
                     while (bluetoothAdapter.isDiscovering() == false) {
                         listarDispositivos(MainActivity.this);
@@ -91,9 +102,11 @@ public class MainActivity extends AppCompatActivity {
                     {
                         switch1.setText("Desativado");
                         textView.setText("");
+                        textView3.setText("");
                         textView2.setText("Com o Bluetooth ativado, o dispositivo pode se comunicar.");
-                        progbar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
                         arrayAdapter.clear();
+                        arrayAdapter2.clear();
                         if (bluetoothAdapter.isEnabled())
                             bluetoothAdapter.disable();
                     }
@@ -113,6 +126,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void listarDispositivos(MainActivity view)
     {
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+        arrayAdapter2 = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        listView2.setAdapter(arrayAdapter2);
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                arrayAdapter2.add(device.getName() + "\n" + device.getAddress());
+            }
+        }
+
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 
         registerReceiver(receiver, filter);

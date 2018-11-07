@@ -3,16 +3,20 @@ package matc89.exercicio1;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     TextView textView2;
     TextView textView3;
     ProgressBar progressBar;
+
+    ConnectionThread connect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +118,36 @@ public class MainActivity extends AppCompatActivity {
                     }
             }
         });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                String item = (String)listView.getItemAtPosition(i);
+                String devName = item.substring(0, item.indexOf("\n"));
+                String devAddress = item.substring(item.indexOf("\n")+1, item.length());
+
+                //connect = new ConnectionThread(devAddress);
+                //connect.start();
+            }
+
+
+        });
+
+        listView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                String item = (String)listView.getItemAtPosition(i);
+                String devName = item.substring(0, item.indexOf("\n"));
+                String devAddress = item.substring(item.indexOf("\n")+1, item.length());
+
+                //connect = new ConnectionThread(devAddress);
+                //connect.start();
+            }
+
+
+        });
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -121,6 +157,16 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 arrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
+        }
+    };
+
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            Bundle bundle = msg.getData();
+            byte[] data = bundle.getByteArray("data");
+            String dataString= new String(data);
         }
     };
 
@@ -151,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onDestroy();
         unregisterReceiver(receiver);
+        if (bluetoothAdapter.isEnabled()) bluetoothAdapter.disable();
     }
 
 }
